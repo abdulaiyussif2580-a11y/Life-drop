@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeDrop - Blood Bank & Donor Network Ghana</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+        }
+        .table-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+        .table-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .pulse-red {
+            animation: pulse-red 2s infinite;
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-20 md:pb-10 min-h-screen flex flex-col">
+
+    <!-- Top Header -->
+    <header class="bg-gradient-to-r from-red-700 via-red-600 to-rose-700 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-white text-red-600 rounded-2xl flex items-center justify-center font-black text-xl shadow-inner">
+                    <i class="fa-solid fa-droplet text-red-600"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight leading-none">LifeDrop <span class="text-xs font-semibold px-2 py-0.5 bg-red-800 text-red-100 rounded-md ml-1">v2.5</span></h1>
+                    <p class="text-[11px] text-red-100 font-medium tracking-wide">Ghana Emergency Blood & Donor Network</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="openDonorModal()" class="bg-white hover:bg-red-50 text-red-700 font-bold px-3 py-1.5 rounded-xl text-xs shadow-sm transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-heart-circle-plus"></i>
+                    <span class="hidden sm:inline">Register Donor (SMS/Email)</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Bar Tabs -->
+    <nav class="bg-white border-b border-slate-200 sticky top-[60px] z-40 shadow-sm">
+        <div class="max-w-5xl mx-auto flex divide-x divide-slate-100 text-xs sm:text-sm">
+            <button id="tab-btn-app" onclick="switchTab('app')" class="flex-1 py-3 px-2 text-center font-bold flex items-center justify-center space-x-2 border-b-2 border-red-600 text-red-700 transition-all">
+                <i class="fa-solid fa-mobile-screen-button"></i>
+                <span>Live App</span>
+            </button>
+            <button id="tab-btn-hospitals" onclick="switchTab('hospitals')" class="flex-1 py-3 px-2 text-center font-bold flex items-center justify-center space-x-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition-all">
+                <i class="fa-solid fa-hospital"></i>
+                <span>Hospitals & Stock</span>
+            </button>
+            <button id="tab-btn-db" onclick="switchTab('db')" class="flex-1 py-3 px-2 text-center font-bold flex items-center justify-center space-x-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition-all">
+                <i class="fa-solid fa-database"></i>
+                <span>SQL Explorer</span>
+            </button>
+            <button id="tab-btn-dispatch" onclick="switchTab('dispatch')" class="flex-1 py-3 px-2 text-center font-bold flex items-center justify-center space-x-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition-all">
+                <i class="fa-solid fa-envelope-open-text"></i>
+                <span>Dispatch Logs</span>
+                <span id="dispatch-badge" class="ml-1 px-1.5 py-0.2 bg-emerald-100 text-emerald-700 text-[10px] rounded-full font-black">0</span>
+            </button>
+            <button id="tab-btn-feedback" onclick="switchTab('feedback')" class="flex-1 py-3 px-2 text-center font-bold flex items-center justify-center space-x-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition-all">
+                <i class="fa-solid fa-comments"></i>
+                <span>Reviewer Board</span>
+                <span id="feedback-badge" class="ml-1 px-1.5 py-0.2 bg-red-100 text-red-700 text-[10px] rounded-full font-black">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="max-w-5xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+
+        <!-- ================= VIEW 1: LIVE APP & EMERGENCY FEED ================= -->
+        <section id="view-app" class="space-y-6">
+            
+            <!-- Regional Spotlight Banner -->
+            <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-red-950 rounded-3xl p-5 text-white shadow-xl relative overflow-hidden">
+                <div class="relative z-10">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <span class="bg-red-600 text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center">
+                            <span class="w-2 h-2 mr-1.5 bg-white rounded-full animate-ping"></span> Live Dispatch Hub
+                        </span>
+                        <div class="flex items-center space-x-2 text-xs text-slate-300">
+                            <i class="fa-solid fa-location-dot text-red-500"></i>
+                            <span>Western Region Priority Node: <strong>Takoradi / Sekondi</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                        <div class="md:col-span-2 space-y-2">
+                            <h2 class="text-2xl font-black tracking-tight text-white">Takoradi Emergency Alert: <span class="text-red-400">O- & B- Needed</span></h2>
+                            <p class="text-slate-300 text-xs leading-relaxed">
+                                Urgent requests logged at <strong>Efia Nkwanta Regional Hospital</strong> & <strong>Kwesimintsim Municipal Hospital</strong>. Test automatic SMS & Email dispatches to donors!
+                            </p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row md:flex-col gap-2">
+                            <button onclick="openRequestModal('Takoradi')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-lg transition text-center pulse-red">
+                                <i class="fa-solid fa-bullhorn mr-1.5"></i> Request Emergency Blood
+                            </button>
+                            <button onclick="openDonorModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold py-2.5 px-4 rounded-xl text-xs border border-slate-600 transition text-center">
+                                <i class="fa-solid fa-user-plus mr-1.5"></i> Join Donor Registry
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-3">
+                <div class="flex items-center space-x-2 w-full md:w-auto">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap"><i class="fa-solid fa-filter mr-1"></i> Region Filter:</span>
+                    <select id="filter-city" onchange="filterRequests()" class="w-full md:w-auto bg-slate-50 border border-slate-300 text-slate-800 text-xs font-bold rounded-xl px-3 py-2 focus:ring-2 focus:ring-red-600 focus:outline-none">
+                        <option value="ALL">All Regions (Ghana)</option>
+                        <option value="Takoradi" selected>Western Region (Takoradi / Sekondi)</option>
+                        <option value="Accra">Greater Accra (Accra / Tema)</option>
+                        <option value="Kumasi">Ashanti Region (Kumasi)</option>
+                    </select>
+                </div>
+                
+                <div class="flex items-center space-x-2 w-full md:w-auto">
+                    <select id="filter-group" onchange="filterRequests()" class="w-full md:w-auto bg-slate-50 border border-slate-300 text-slate-800 text-xs font-bold rounded-xl px-3 py-2 focus:ring-2 focus:ring-red-600 focus:outline-none">
+                        <option value="ALL">All Blood Groups</option>
+                        <option value="O-">O- (Universal)</option>
+                        <option value="O+">O+</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Emergency Requests List Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Active Broadcasts -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-extrabold text-slate-800 flex items-center">
+                            <i class="fa-solid fa-truck-medical text-red-600 mr-2"></i> Active Emergency Broadcasts
+                        </h3>
+                        <span id="request-count-badge" class="text-xs font-bold bg-slate-200 text-slate-700 px-2.5 py-0.5 rounded-full">3 Active</span>
+                    </div>
+
+                    <div id="requests-list" class="space-y-3">
+                        <!-- Rendered Dynamically -->
+                    </div>
+                </div>
+
+                <!-- Live Donor Matching & SMS/Email Dispatch Simulator Sidebar -->
+                <div class="space-y-4">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-9 h-9 bg-red-100 text-red-600 rounded-xl flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm">Interactive SMS & Email Alert Engine</h4>
+                                <p class="text-[11px] text-slate-500">Test live messaging dispatch trigger</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 text-xs">
+                            <label class="block font-semibold text-slate-600">Select City & Target Blood Group:</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <select id="sim-city" class="bg-slate-50 border border-slate-300 rounded-xl p-2 font-medium">
+                                    <option value="Takoradi">Takoradi</option>
+                                    <option value="Accra">Accra</option>
+                                    <option value="Kumasi">Kumasi</option>
+                                </select>
+                                <select id="sim-group" class="bg-slate-50 border border-slate-300 rounded-xl p-2 font-bold text-red-700">
+                                    <option value="O-">O- Negative</option>
+                                    <option value="O+">O+ Positive</option>
+                                    <option value="B+">B+ Positive</option>
+                                    <option value="B-">B- Negative</option>
+                                    <option value="A+">A+ Positive</option>
+                                </select>
+                            </div>
+                            <button onclick="runDonorDispatchSim()" class="w-full mt-2 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-xs transition shadow flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                <span>Trigger SMS & Email Broadcast</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Impact Summary Card -->
+                    <div class="bg-gradient-to-br from-red-600 to-rose-700 text-white p-5 rounded-2xl shadow-md space-y-3">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-red-200">Takoradi & Ghana Network Stats</h4>
+                        <div class="grid grid-cols-2 gap-2 text-center">
+                            <div class="bg-red-800/50 p-2.5 rounded-xl border border-red-500/30">
+                                <span class="text-xl font-black block" id="stat-donors">184</span>
+                                <span class="text-[10px] text-red-100 font-medium uppercase">Active Donors</span>
+                            </div>
+                            <div class="bg-red-800/50 p-2.5 rounded-xl border border-red-500/30">
+                                <span class="text-xl font-black block">4</span>
+                                <span class="text-[10px] text-red-100 font-medium uppercase">Takoradi Hospitals</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ================= VIEW 2: HOSPITALS & BLOOD INVENTORY ================= -->
+        <section id="view-hospitals" class="hidden space-y-6">
+            
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-xl font-extrabold text-slate-800 flex items-center">
+                        <i class="fa-solid fa-hospital text-red-600 mr-2"></i> Hospital Directory & Stock Levels
+                    </h2>
+                    <p class="text-xs text-slate-500">Real-time blood bank inventory connected to Takoradi & Regional Healthcare Centers.</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs font-bold text-slate-600">Region:</span>
+                    <select id="hospital-region-filter" onchange="renderHospitals()" class="bg-slate-100 border border-slate-300 font-bold text-xs rounded-xl px-3 py-2 text-slate-800">
+                        <option value="ALL">All Regions</option>
+                        <option value="Takoradi" selected>Takoradi (Western Region)</option>
+                        <option value="Accra">Accra (Greater Accra)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Hospital Inventory Cards Container -->
+            <div id="hospitals-container" class="grid grid-cols-1 gap-4">
+                <!-- Rendered Dynamically -->
+            </div>
+
+        </section>
+
+        <!-- ================= VIEW 3: SQL DATABASE EXPLORER ================= -->
+        <section id="view-db" class="hidden space-y-6">
+            
+            <div class="bg-slate-900 text-white p-5 rounded-2xl shadow-lg flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-slate-800 text-emerald-400 rounded-xl flex items-center justify-center text-xl font-mono">
+                        <i class="fa-solid fa-database"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold">Relational SQL Schema & Data Tables</h2>
+                        <p class="text-xs text-slate-400">Live database view storing donor contacts, emails, phone numbers, and emergency requests.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Navigation Tabs -->
+            <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-2">
+                <button onclick="showDbTable('donors')" id="btn-tbl-donors" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white">
+                    tbl_donors (Phone/Email)
+                </button>
+                <button onclick="showDbTable('hospitals')" id="btn-tbl-hospitals" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-200 text-slate-700 hover:bg-slate-300">
+                    tbl_hospitals
+                </button>
+                <button onclick="showDbTable('inventory')" id="btn-tbl-inventory" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-200 text-slate-700 hover:bg-slate-300">
+                    tbl_blood_inventory
+                </button>
+                <button onclick="showDbTable('requests')" id="btn-tbl-requests" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-200 text-slate-700 hover:bg-slate-300">
+                    tbl_emergency_requests
+                </button>
+            </div>
+
+            <!-- DB Table Views -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                
+                <!-- Table: Donors -->
+                <div id="db-table-donors" class="table-scroll overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider">
+                            <tr>
+                                <th class="p-3">donor_id (PK)</th>
+                                <th class="p-3">full_name</th>
+                                <th class="p-3">blood_group</th>
+                                <th class="p-3">city_location</th>
+                                <th class="p-3">phone_number (+233)</th>
+                                <th class="p-3">email_address</th>
+                                <th class="p-3">status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 font-mono text-slate-600" id="db-donors-body">
+                            <!-- Dynamically injected -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Table: Hospitals -->
+                <div id="db-table-hospitals" class="hidden table-scroll overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider">
+                            <tr>
+                                <th class="p-3">hospital_id (PK)</th>
+                                <th class="p-3">hospital_name</th>
+                                <th class="p-3">city_location</th>
+                                <th class="p-3">contact_phone</th>
+                                <th class="p-3">emergency_status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 font-mono text-slate-600" id="db-hospitals-body">
+                            <!-- Dynamically injected -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Table: Inventory -->
+                <div id="db-table-inventory" class="hidden table-scroll overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider">
+                            <tr>
+                                <th class="p-3">inventory_id (PK)</th>
+                                <th class="p-3">hospital_name (FK)</th>
+                                <th class="p-3">blood_group</th>
+                                <th class="p-3">units_available</th>
+                                <th class="p-3">stock_level</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 font-mono text-slate-600" id="db-inventory-body">
+                            <!-- Dynamically injected -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Table: Requests -->
+                <div id="db-table-requests" class="hidden table-scroll overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider">
+                            <tr>
+                                <th class="p-3">request_id (PK)</th>
+                                <th class="p-3">hospital_name</th>
+                                <th class="p-3">required_group</th>
+                                <th class="p-3">units_needed</th>
+                                <th class="p-3">city</th>
+                                <th class="p-3">urgency</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 font-mono text-slate-600" id="db-requests-body">
+                            <!-- Dynamically injected -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <!-- SQL Query Sample -->
+            <div class="bg-slate-900 rounded-2xl p-4 text-emerald-400 font-mono text-xs overflow-x-auto shadow-inner">
+                <div class="text-slate-400 text-[10px] uppercase font-sans mb-1">// Example SQL Query: Find O- Donors Phone and Email in Takoradi</div>
+                <code>
+                    <span class="text-blue-400">SELECT</span> d.full_name, d.phone_number, d.email_address, d.city_location <br>
+                    <span class="text-blue-400">FROM</span> tbl_donors d <br>
+                    <span class="text-blue-400">WHERE</span> d.city_location = <span class="text-amber-300">'Takoradi'</span> <br>
+                    <span class="text-blue-400">AND</span> d.blood_group = <span class="text-amber-300">'O-'</span> <br>
+                    <span class="text-blue-400">AND</span> d.status = <span class="text-amber-300">'AVAILABLE'</span>;
+                </code>
+            </div>
+
+        </section>
+
+        <!-- ================= VIEW 4: DISPATCH LOGS ================= -->
+        <section id="view-dispatch" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Simulated SMS & Email Dispatch Logs</h2>
+                        <p class="text-xs text-slate-500">Live outbound message queue simulating SMS (+233) and Email alerts sent to donors.</p>
+                    </div>
+                </div>
+
+                <div id="dispatch-logs-container" class="space-y-3 pt-2">
+                    <!-- Dynamic Logs -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 5: REVIEWER & FEEDBACK BOARD ================= -->
+        <section id="view-feedback" class="hidden space-y-6">
+            
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Reviewer & Mentor Feedback Board</h2>
+                        <p class="text-xs text-slate-500">Test the prototype, enter your details, and submit your suggestions or scholarship recommendations!</p>
+                    </div>
+                </div>
+
+                <!-- Submission Form -->
+                <form onsubmit="submitFeedback(event)" class="space-y-3 pt-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Your Name / Role</label>
+                            <input type="text" id="fb-name" required placeholder="e.g. Mentor / Tester" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-600">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Feedback Category</label>
+                            <select id="fb-category" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-600 bg-white">
+                                <option value="Feature Idea">💡 Feature Suggestion</option>
+                                <option value="Takoradi Integration">🏥 Takoradi & Health Logistics</option>
+                                <option value="Scholarship Portfolio">🎓 Scholarship Essay Advice</option>
+                                <option value="General Feedback">❤️ General Encouragement</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Your Comment or Suggestion</label>
+                        <textarea id="fb-comment" required rows="3" placeholder="What features or tech improvements would make this app even stronger?" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-600"></textarea>
+                    </div>
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>Submit Feedback</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Feedback Cards List -->
+            <div class="space-y-3">
+                <h3 class="text-base font-extrabold text-slate-800 flex items-center">
+                    <i class="fa-solid fa-comments text-red-600 mr-2"></i> Shared Feedback & Reviews
+                </h3>
+                <div id="feedback-list" class="space-y-3">
+                    <!-- Dynamic -->
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- Modal: Register Donor (With Phone & Email) -->
+    <div id="modal-donor" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeDonorModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="flex items-center space-x-2.5 mb-1">
+                <i class="fa-solid fa-user-plus text-red-600 text-lg"></i>
+                <h3 class="text-xl font-bold text-slate-800">Register as Blood Donor</h3>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">Enter your contact details to receive SMS emergency dispatches & email confirmations.</p>
+
+            <form onsubmit="handleRegisterDonor(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Full Name *</label>
+                    <input type="text" id="reg-name" required placeholder="e.g. Kweku Mensah" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-600 focus:outline-none">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Blood Group *</label>
+                        <select id="reg-group" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-600 focus:outline-none bg-white font-bold text-red-700">
+                            <option value="O-">O- (Universal)</option>
+                            <option value="O+">O+</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">City / Location *</label>
+                        <select id="reg-city" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-600 focus:outline-none bg-white">
+                            <option value="Takoradi">Takoradi (Sekondi)</option>
+                            <option value="Accra">Accra</option>
+                            <option value="Kumasi">Kumasi</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Phone Number (SMS & WhatsApp Alert) *</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2.5 text-xs font-bold text-slate-400">+233</span>
+                        <input type="tel" id="reg-phone" required placeholder="24 123 4567" class="w-full pl-14 pr-3 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-600 focus:outline-none font-medium">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Email Address (Confirmation) *</label>
+                    <input type="email" id="reg-email" required placeholder="kweku@example.com" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-600 focus:outline-none">
+                </div>
+
+                <div class="bg-red-50 p-3 rounded-xl border border-red-100 flex items-start space-x-2 text-[11px] text-red-800">
+                    <i class="fa-solid fa-shield-halved text-red-600 mt-0.5"></i>
+                    <span>Submitting will add your record to <strong>tbl_donors</strong> in SQL and trigger a simulated SMS & Email dispatch log.</span>
+                </div>
+
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow mt-2">
+                    Submit Donor Registration
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Request Blood -->
+    <div id="modal-request" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl relative">
+            <button onclick="closeRequestModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="text-xl font-bold text-slate-800 mb-1">Post Emergency Blood Request</h3>
+            <p class="text-xs text-slate-500 mb-4">Broadcast an alert to nearby registered donors in Takoradi or Ghana.</p>
+
+            <form onsubmit="handleCreateRequest(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Hospital Name</label>
+                    <select id="req-hospital" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-600 focus:outline-none bg-white">
+                        <option value="Efia Nkwanta Regional Hospital">Efia Nkwanta Regional Hospital (Takoradi)</option>
+                        <option value="Takoradi Government Hospital (European)">Takoradi Government / European Hospital</option>
+                        <option value="Kwesimintsim Municipal Hospital">Kwesimintsim Municipal Hospital (Takoradi)</option>
+                        <option value="GPHA Hospital Takoradi">GPHA Hospital (Takoradi)</option>
+                        <option value="Korle Bu Teaching Hospital">Korle Bu Teaching Hospital (Accra)</option>
+                        <option value="Ridge Regional Hospital">Ridge Regional Hospital (Accra)</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Blood Group</label>
+                        <select id="req-group" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-600 focus:outline-none bg-white font-bold text-red-700">
+                            <option value="O-">O- (Universal)</option>
+                            <option value="O+">O+</option>
+                            <option value="B-">B-</option>
+                            <option value="B+">B+</option>
+                            <option value="A+">A+</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Units Needed</label>
+                        <input type="number" id="req-units" min="1" max="10" value="2" required class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-600 focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Urgency Level</label>
+                    <select id="req-urgency" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-600 focus:outline-none bg-white">
+                        <option value="CRITICAL">🔴 CRITICAL (Immediate Need)</option>
+                        <option value="HIGH">🟠 HIGH (Within 6 Hours)</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow mt-2">
+                    Broadcast Request
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Live Notification Popup Dialog for Dispatch Simulation -->
+    <div id="dispatch-popup" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4 border border-slate-100 relative">
+            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-xl font-bold mx-auto">
+                <i class="fa-solid fa-paper-plane"></i>
+            </div>
+            <div class="text-center space-y-1">
+                <h4 class="font-extrabold text-slate-800 text-base">Alert Dispatch Dispatched!</h4>
+                <p class="text-xs text-slate-500">Messaging Engine triggered simulated SMS and Email broadcasts.</p>
+            </div>
+            
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-2 font-mono">
+                <div class="flex items-center text-emerald-700 font-bold space-x-1.5">
+                    <i class="fa-solid fa-comment-sms"></i>
+                    <span>SMS Queue:</span>
+                </div>
+                <p id="popup-sms-text" class="text-[11px] text-slate-700">SMS content here</p>
+                
+                <div class="flex items-center text-blue-700 font-bold space-x-1.5 pt-1 border-t border-slate-200">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span>Email Dispatch:</span>
+                </div>
+                <p id="popup-email-text" class="text-[11px] text-slate-700">Email content here</p>
+            </div>
+
+            <button onclick="closeDispatchPopup()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 rounded-xl text-xs">
+                Dismiss Simulation
+            </button>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast-box" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 transition">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toast-message" class="text-xs font-medium">Notification message</span>
+    </div>
+
+    <!-- JavaScript Data & Interactivity -->
+    <script>
+        // Hospitals Data (including Takoradi Hospitals)
+        const hospitalsData = [
+            {
+                id: 'HOSP-TK01',
+                name: 'Efia Nkwanta Regional Hospital',
+                city: 'Takoradi',
+                phone: '031 202 2144',
+                status: 'CRITICAL_NEED',
+                inventory: [
+                    { group: 'O-', units: 1, status: 'Critical' },
+                    { group: 'O+', units: 12, status: 'Moderate' },
+                    { group: 'B-', units: 0, status: 'Critical' },
+                    { group: 'A+', units: 8, status: 'Stable' }
+                ]
+            },
+            {
+                id: 'HOSP-TK02',
+                name: 'Takoradi Government Hospital (European)',
+                city: 'Takoradi',
+                phone: '031 202 2541',
+                status: 'STABLE',
+                inventory: [
+                    { group: 'O-', units: 4, status: 'Low' },
+                    { group: 'O+', units: 18, status: 'Stable' },
+                    { group: 'B+', units: 10, status: 'Stable' },
+                    { group: 'A+', units: 6, status: 'Moderate' }
+                ]
+            },
+            {
+                id: 'HOSP-TK03',
+                name: 'Kwesimintsim Municipal Hospital',
+                city: 'Takoradi',
+                phone: '031 202 1109',
+                status: 'CRITICAL_NEED',
+                inventory: [
+                    { group: 'O-', units: 0, status: 'Critical' },
+                    { group: 'O+', units: 5, status: 'Low' },
+                    { group: 'B+', units: 4, status: 'Low' }
+                ]
+            },
+            {
+                id: 'HOSP-TK04',
+                name: 'GPHA Hospital Takoradi',
+                city: 'Takoradi',
+                phone: '031 202 4471',
+                status: 'STABLE',
+                inventory: [
+                    { group: 'O+', units: 15, status: 'Stable' },
+                    { group: 'A+', units: 9, status: 'Stable' }
+                ]
+            },
+            {
+                id: 'HOSP-ACC01',
+                name: 'Korle Bu Teaching Hospital',
+                city: 'Accra',
+                phone: '030 266 5401',
+                status: 'MODERATE',
+                inventory: [
+                    { group: 'O-', units: 3, status: 'Low' },
+                    { group: 'O+', units: 25, status: 'Stable' }
+                ]
+            }
+        ];
+
+        let donorsData = [
+            { id: 'DNR-TK01', name: 'Papa Yaw Ansah', group: 'O-', city: 'Takoradi', phone: '+233 24 333 1122', email: 'papayaw@example.com', status: 'AVAILABLE' },
+            { id: 'DNR-TK02', name: 'Efua Egyirba', group: 'B+', city: 'Takoradi', phone: '+233 20 777 8899', email: 'efua.e@example.com', status: 'AVAILABLE' },
+            { id: 'DNR-ACC01', name: 'Kwame Mensah', group: 'O+', city: 'Accra', phone: '+233 24 123 4567', email: 'kwame.m@example.com', status: 'AVAILABLE' }
+        ];
+
+        let requestsData = [
+            { id: 'REQ-901', hospital: 'Efia Nkwanta Regional Hospital', group: 'O-', units: 3, city: 'Takoradi', urgency: 'CRITICAL', status: 'DISPATCHED', time: '5 mins ago' },
+            { id: 'REQ-902', hospital: 'Kwesimintsim Municipal Hospital', group: 'B-', units: 2, city: 'Takoradi', urgency: 'CRITICAL', status: 'SEARCHING', time: '20 mins ago' },
+            { id: 'REQ-903', hospital: 'Korle Bu Teaching Hospital', group: 'A+', units: 2, city: 'Accra', urgency: 'HIGH', status: 'DONOR_FOUND', time: '1 hour ago' }
+        ];
+
+        let dispatchLogs = [
+            { id: 1, type: 'SMS + EMAIL', recipient: '+233 24 333 1122 / papayaw@example.com', text: 'URGENT LIFEDROP ALERT: Efia Nkwanta Hosp Takoradi needs 3 u of O- blood. Reply YES if available.', time: '5 mins ago' }
+        ];
+
+        let feedbackData = [
+            { id: 1, name: 'Dr. Kobina Baidoo (Takoradi)', category: 'Takoradi Integration', comment: 'Adding Efia Nkwanta and Kwesimintsim hospitals reflects true health logistics needs in Western Region. Great work!', upvotes: 7, timestamp: '1 hour ago' },
+            { id: 2, name: 'Scholarship Assessor', category: 'Scholarship Portfolio', comment: 'Clear database architecture and real-world application. Highlight this prototype in your Mastercard Scholars essay.', upvotes: 11, timestamp: 'Yesterday' }
+        ];
+
+        // Initialization
+        window.onload = function() {
+            const savedFb = localStorage.getItem('lifedrop_v25_fb');
+            if(savedFb) feedbackData = JSON.parse(savedFb);
+            
+            renderRequests();
+            renderHospitals();
+            renderDbTables();
+            renderDispatchLogs();
+            renderFeedback();
+        };
+
+        // Navigation Tabs
+        function switchTab(tab) {
+            ['app', 'hospitals', 'db', 'dispatch', 'feedback'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${t}`).className = "flex-1 py-3 px-2 text-center font-bold flex items-center justify-center space-x-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition-all";
+            });
+
+            document.getElementById(`view-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tab}`).className = "flex-1 py-3 px-2 text-center font-bold flex items-center justify-center space-x-2 border-b-2 border-red-600 text-red-700 transition-all";
+        }
+
+        // Render Emergency Requests Feed
+        function renderRequests() {
+            const cityFilter = document.getElementById('filter-city').value;
+            const groupFilter = document.getElementById('filter-group').value;
+
+            const filtered = requestsData.filter(r => {
+                const matchCity = cityFilter === 'ALL' || r.city === cityFilter;
+                const matchGroup = groupFilter === 'ALL' || r.group === groupFilter;
+                return matchCity && matchGroup;
+            });
+
+            document.getElementById('request-count-badge').innerText = `${filtered.length} Active`;
+            const container = document.getElementById('requests-list');
+
+            if(filtered.length === 0) {
+                container.innerHTML = `<div class="bg-white p-6 text-center text-slate-400 text-xs font-semibold rounded-2xl border border-slate-200">No active blood requests match your selected filter.</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(r => `
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-11 h-11 rounded-2xl bg-red-100 text-red-700 flex items-center justify-center font-black text-base shrink-0">
+                            ${r.group}
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h4 class="font-extrabold text-slate-800 text-sm">${r.hospital}</h4>
+                                <span class="text-[10px] font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md"><i class="fa-solid fa-location-dot text-red-500 mr-1"></i>${r.city}</span>
+                            </div>
+                            <div class="flex items-center space-x-3 text-xs text-slate-500 mt-1">
+                                <span><i class="fa-solid fa-cubes text-slate-400 mr-1"></i>${r.units} Units Needed</span>
+                                <span>•</span>
+                                <span>${r.time}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                        <span class="text-[10px] font-black px-2.5 py-1 rounded-full ${r.urgency === 'CRITICAL' ? 'bg-red-600 text-white animate-pulse' : 'bg-amber-500 text-white'}">
+                            ${r.urgency}
+                        </span>
+                        <button onclick="triggerDonorMatch('${r.group}', '${r.city}', '${r.hospital}')" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center space-x-1">
+                            <i class="fa-solid fa-paper-plane text-[10px]"></i>
+                            <span>Alert Donors</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterRequests() { renderRequests(); }
+
+        // Render Hospital Directory & Stock Levels
+        function renderHospitals() {
+            const filter = document.getElementById('hospital-region-filter').value;
+            const container = document.getElementById('hospitals-container');
+
+            const filtered = hospitalsData.filter(h => filter === 'ALL' || h.city === filter);
+
+            container.innerHTML = filtered.map(h => `
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-3">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h3 class="font-extrabold text-slate-800 text-base">${h.name}</h3>
+                                <span class="text-[10px] font-bold px-2 py-0.5 bg-red-50 text-red-700 rounded-md border border-red-200"><i class="fa-solid fa-location-dot mr-1"></i>${h.city}</span>
+                            </div>
+                            <span class="text-xs text-slate-500"><i class="fa-solid fa-phone text-slate-400 mr-1"></i>Contact: ${h.phone}</span>
+                        </div>
+                        <span class="text-[10px] font-bold px-3 py-1 rounded-full ${h.status === 'CRITICAL_NEED' ? 'bg-red-100 text-red-800 border border-red-200' : 'bg-emerald-100 text-emerald-800 border border-emerald-200'}">
+                            ${h.status === 'CRITICAL_NEED' ? '⚠️ Shortage Alert' : '✅ Operational'}
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        ${h.inventory.map(inv => `
+                            <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                                <div>
+                                    <span class="text-[10px] text-slate-400 font-bold block">GROUP</span>
+                                    <span class="font-black text-slate-800 text-sm">${inv.group}</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="font-bold text-sm ${inv.units <= 2 ? 'text-red-600' : 'text-slate-800'}">${inv.units} u</span>
+                                    <span class="block text-[9px] font-bold text-slate-400 uppercase">${inv.status}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Database Explorer Tables
+        function renderDbTables() {
+            // Donors Table
+            document.getElementById('db-donors-body').innerHTML = donorsData.map(d => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-bold text-slate-700">${d.id}</td>
+                    <td class="p-3 font-sans font-medium text-slate-800">${d.name}</td>
+                    <td class="p-3 font-bold text-red-600">${d.group}</td>
+                    <td class="p-3 font-sans">${d.city}</td>
+                    <td class="p-3 text-emerald-700 font-bold">${d.phone}</td>
+                    <td class="p-3 text-blue-700 font-bold">${d.email}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 text-[10px] bg-emerald-100 text-emerald-800 rounded-full font-bold">${d.status}</span></td>
+                </tr>
+            `).join('');
+
+            // Hospitals Table
+            document.getElementById('db-hospitals-body').innerHTML = hospitalsData.map(h => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-bold text-red-600">${h.id}</td>
+                    <td class="p-3 font-sans font-medium text-slate-800">${h.name}</td>
+                    <td class="p-3 font-sans">${h.city}</td>
+                    <td class="p-3">${h.phone}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 text-[10px] bg-slate-100 text-slate-700 rounded-full font-bold">${h.status}</span></td>
+                </tr>
+            `).join('');
+
+            // Inventory Table
+            let invRows = [];
+            hospitalsData.forEach((h) => {
+                h.inventory.forEach(inv => {
+                    invRows.push(`
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3 text-slate-500">INV-${Math.floor(100+Math.random()*900)}</td>
+                            <td class="p-3 font-sans font-medium text-slate-800">${h.name}</td>
+                            <td class="p-3 font-bold text-red-600">${inv.group}</td>
+                            <td class="p-3 font-bold">${inv.units}</td>
+                            <td class="p-3"><span class="px-2 py-0.5 text-[10px] ${inv.units <= 2 ? 'bg-red-100 text-red-800' : 'bg-slate-100 text-slate-700'} rounded-full font-bold">${inv.status}</span></td>
+                        </tr>
+                    `);
+                });
+            });
+            document.getElementById('db-inventory-body').innerHTML = invRows.join('');
+
+            // Requests Table
+            document.getElementById('db-requests-body').innerHTML = requestsData.map(r => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-bold text-red-600">${r.id}</td>
+                    <td class="p-3 font-sans font-medium text-slate-800">${r.hospital}</td>
+                    <td class="p-3 font-bold">${r.group}</td>
+                    <td class="p-3">${r.units}</td>
+                    <td class="p-3 font-sans">${r.city}</td>
+                    <td class="p-3 font-sans font-bold text-red-600">${r.urgency}</td>
+                </tr>
+            `).join('');
+        }
+
+        function showDbTable(tableName) {
+            ['donors', 'hospitals', 'inventory', 'requests'].forEach(t => {
+                document.getElementById(`db-table-${t}`).classList.add('hidden');
+                document.getElementById(`btn-tbl-${t}`).className = "px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-200 text-slate-700 hover:bg-slate-300";
+            });
+
+            document.getElementById(`db-table-${tableName}`).classList.remove('hidden');
+            document.getElementById(`btn-tbl-${tableName}`).className = "px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white";
+        }
+
+        // Render Outbound Dispatch Logs
+        function renderDispatchLogs() {
+            document.getElementById('dispatch-badge').innerText = dispatchLogs.length;
+            const container = document.getElementById('dispatch-logs-container');
+
+            if(dispatchLogs.length === 0) {
+                container.innerHTML = `<div class="text-center text-slate-400 text-xs py-4">No outbound dispatches logged yet.</div>`;
+                return;
+            }
+
+            container.innerHTML = dispatchLogs.map(log => `
+                <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-1.5 font-mono text-xs">
+                    <div class="flex items-center justify-between text-slate-500 text-[11px]">
+                        <span class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200"><i class="fa-solid fa-tower-broadcast mr-1"></i>${log.type}</span>
+                        <span>${log.time}</span>
+                    </div>
+                    <div class="text-slate-800 font-bold">To: <span class="text-blue-700">${log.recipient}</span></div>
+                    <div class="text-slate-600 bg-white p-2 rounded-xl border border-slate-200 text-[11px] leading-relaxed">"${log.text}"</div>
+                </div>
+            `).join('');
+        }
+
+        // Render Feedback List
+        function renderFeedback() {
+            document.getElementById('feedback-badge').innerText = feedbackData.length;
+            const container = document.getElementById('feedback-list');
+
+            container.innerHTML = feedbackData.map(fb => `
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-xs text-slate-800"><i class="fa-solid fa-user-circle text-slate-400 mr-1.5"></i>${fb.name}</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md">${fb.category}</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed font-sans">${fb.comment}</p>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-[11px] text-slate-400">
+                        <span>${fb.timestamp}</span>
+                        <button onclick="upvoteFeedback(${fb.id})" class="flex items-center space-x-1 text-slate-700 hover:text-red-600 font-bold transition">
+                            <i class="fa-regular fa-thumbs-up"></i>
+                            <span>${fb.upvotes} Upvotes</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Handlers & Actions
+        function openDonorModal() { document.getElementById('modal-donor').classList.remove('hidden'); }
+        function closeDonorModal() { document.getElementById('modal-donor').classList.add('hidden'); }
+        function openRequestModal(city = 'Takoradi') { document.getElementById('modal-request').classList.remove('hidden'); }
+        function closeRequestModal() { document.getElementById('modal-request').classList.add('hidden'); }
+        function closeDispatchPopup() { document.getElementById('dispatch-popup').classList.add('hidden'); }
+
+        function handleRegisterDonor(e) {
+            e.preventDefault();
+            const phoneInput = document.getElementById('reg-phone').value;
+            const formattedPhone = phoneInput.startsWith('+233') ? phoneInput : `+233 ${phoneInput}`;
+            
+            const newDonor = {
+                id: `DNR-${Math.floor(100+Math.random()*900)}`,
+                name: document.getElementById('reg-name').value,
+                group: document.getElementById('reg-group').value,
+                city: document.getElementById('reg-city').value,
+                phone: formattedPhone,
+                email: document.getElementById('reg-email').value,
+                status: 'AVAILABLE'
+            };
+
+            donorsData.unshift(newDonor);
+            document.getElementById('stat-donors').innerText = 184 + donorsData.length - 3;
+            renderDbTables();
+
+            // Log SMS and Email dispatch
+            const smsText = `LIFEDROP REGISTRATION CONFIRMED: Welcome ${newDonor.name}! You are registered as an emergency ${newDonor.group} donor in ${newDonor.city}.`;
+            const emailText = `Dear ${newDonor.name},\nThank you for enrolling in the LifeDrop Emergency Blood Donor Registry for ${newDonor.city}. Your donor ID is ${newDonor.id}.`;
+
+            dispatchLogs.unshift({
+                id: Date.now(),
+                type: 'WELCOME SMS & EMAIL',
+                recipient: `${newDonor.phone} / ${newDonor.email}`,
+                text: smsText,
+                time: 'Just now'
+            });
+            renderDispatchLogs();
+
+            closeDonorModal();
+            
+            // Open Simulation Popup
+            document.getElementById('popup-sms-text').innerText = smsText;
+            document.getElementById('popup-email-text').innerText = emailText;
+            document.getElementById('dispatch-popup').classList.remove('hidden');
+
+            showToast(`Registered! SMS sent to ${newDonor.phone} & email to ${newDonor.email}`);
+            e.target.reset();
+        }
+
+        function handleCreateRequest(e) {
+            e.preventDefault();
+            const hospitalName = document.getElementById('req-hospital').value;
+            const isTakoradi = hospitalName.includes('Takoradi') || hospitalName.includes('Efia') || hospitalName.includes('Kwesimintsim') || hospitalName.includes('GPHA');
+
+            const newReq = {
+                id: `REQ-${Math.floor(900+Math.random()*90)}`,
+                hospital: hospitalName,
+                group: document.getElementById('req-group').value,
+                units: document.getElementById('req-units').value,
+                city: isTakoradi ? 'Takoradi' : 'Accra',
+                urgency: document.getElementById('req-urgency').value,
+                status: 'SEARCHING',
+                time: 'Just now'
+            };
+
+            requestsData.unshift(newReq);
+            renderRequests();
+            renderDbTables();
+            closeRequestModal();
+
+            triggerDonorMatch(newReq.group, newReq.city, newReq.hospital);
+            e.target.reset();
+        }
+
+        function runDonorDispatchSim() {
+            const city = document.getElementById('sim-city').value;
+            const group = document.getElementById('sim-group').value;
+            triggerDonorMatch(group, city, `${city} Central Hospital Node`);
+        }
+
+        function triggerDonorMatch(group, city, hospital = 'Takoradi Hospital Node') {
+            const matches = donorsData.filter(d => d.city === city && d.group === group);
+            const recipientStr = matches.length > 0 
+                ? matches.map(m => `${m.phone} (${m.email})`).join(', ')
+                : `+233 24 333 1122 (papayaw@example.com), +233 20 777 8899`;
+
+            const smsMsg = `EMERGENCY BLOOD ALERT: ${hospital} needs ${group} blood urgently. Please report to the blood bank or reply YES.`;
+            const emailMsg = `URGENT NOTICE: ${hospital} in ${city} has issued an emergency call for ${group} donors. Contact blood bank immediately.`;
+
+            dispatchLogs.unshift({
+                id: Date.now(),
+                type: 'EMERGENCY DISPATCH BROADCAST',
+                recipient: recipientStr,
+                text: smsMsg,
+                time: 'Just now'
+            });
+            renderDispatchLogs();
+
+            document.getElementById('popup-sms-text').innerText = smsMsg;
+            document.getElementById('popup-email-text').innerText = emailMsg;
+            document.getElementById('dispatch-popup').classList.remove('hidden');
+
+            showToast(`Broadcast triggered to ${group} donors in ${city}!`);
+        }
+
+        function submitFeedback(e) {
+            e.preventDefault();
+            const newFb = {
+                id: Date.now(),
+                name: document.getElementById('fb-name').value,
+                category: document.getElementById('fb-category').value,
+                comment: document.getElementById('fb-comment').value,
+                upvotes: 1,
+                timestamp: 'Just now'
+            };
+            feedbackData.unshift(newFb);
+            localStorage.setItem('lifedrop_v25_fb', JSON.stringify(feedbackData));
+            renderFeedback();
+            showToast('Feedback saved! Thank you for reviewing.');
+            e.target.reset();
+        }
+
+        function upvoteFeedback(id) {
+            const item = feedbackData.find(f => f.id === id);
+            if(item) {
+                item.upvotes++;
+                localStorage.setItem('lifedrop_v25_fb', JSON.stringify(feedbackData));
+                renderFeedback();
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast-box');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => { toast.classList.add('hidden'); }, 3500);
+        }
+    </script>
+</body>
+</html>
